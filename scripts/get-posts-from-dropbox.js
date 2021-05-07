@@ -40,7 +40,11 @@ dbx
           .filesDownload({ path: path_lower })
           .then(data => {
             const filename = path.resolve(POSTS_DIR, name);
-            const filecontents = data.fileBlob.toString();
+    console.log("========");
+    console.log("========");
+    console.log("========");
+            console.log(data);
+            const filecontents = data.result.fileBinary.toString();
 
             fs.outputFile(filename, filecontents).catch(error => {
               if (error) {
