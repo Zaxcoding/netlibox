@@ -4,3 +4,5 @@ Gemfile.lock
 .jekyll-metadata
 src/_posts
 .env
+.DS_Store
+node_modules

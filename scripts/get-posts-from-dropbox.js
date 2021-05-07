@@ -5,9 +5,6 @@ const fs = require("fs-extra");
 const Dropbox = require("dropbox").Dropbox;
 
 
-console.log("TOKEN IS:" + process.env.DBX_ACCESS_TOKEN);
-
-
 // Setup our interface for the Dropbox API with our token
 // If there's no token, we'll just go ahead and exit this script now.
 if (!process.env.DBX_ACCESS_TOKEN) {
@@ -30,8 +27,12 @@ fs.ensureDirSync(POSTS_DIR);
 // them all to our local posts folder.
 dbx
   .filesListFolder({ path: "" })
-  .then(response => {
-    response.entries.forEach(entry => {
+  .then((response) => {
+    console.log(response);
+    console.log("========");
+    response.result.entries.forEach(entry => {
+    console.log("========");
+      console.log(entry);
       const { name, path_lower } = entry;
 
       if (entry[".tag"] === "file") {
