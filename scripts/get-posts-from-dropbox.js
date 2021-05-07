@@ -4,6 +4,10 @@ const path = require("path");
 const fs = require("fs-extra");
 const Dropbox = require("dropbox").Dropbox;
 
+
+console.log("TOKEN IS:" + process.env.DBX_ACCESS_TOKEN);
+
+
 // Setup our interface for the Dropbox API with our token
 // If there's no token, we'll just go ahead and exit this script now.
 if (!process.env.DBX_ACCESS_TOKEN) {
