@@ -35,6 +35,7 @@ function recursivelyDownloadFromDropbox(
 const folderToRetrieve = path.join(relativeToDropboxDirectory, toRetrieve) == "." ? "" : path.join(relativeToDropboxDirectory, toRetrieve);
 
 console.log(`Retrieving files from the folder "${folderToRetrieve}"`);
+console.log(`Writing to the folder ${currFolder}`);
   dbx
     .filesListFolder({ path: folderToRetrieve})
     .then((response) => {
@@ -42,7 +43,6 @@ console.log(`Retrieving files from the folder "${folderToRetrieve}"`);
       // console.log("========");
       response.result.entries.forEach(entry => {
         // console.log("========");
-        console.log(entry);
         const { name, path_lower } = entry;
 
         const filename = path.resolve(currFolder, name);
@@ -51,10 +51,6 @@ console.log(`Retrieving files from the folder "${folderToRetrieve}"`);
           dbx
             .filesDownload({ path: path_lower })
             .then(data => {
-              console.log("========");
-              console.log("========");
-              console.log("========");
-              console.log(data);
               const filecontents = data.result.fileBinary.toString();
 
               fs.outputFile(filename, filecontents).catch(error => {
@@ -68,7 +64,7 @@ console.log(`Retrieving files from the folder "${folderToRetrieve}"`);
             });
         }
         else if (entry[".tag"] === "folder") {
-            recursivelyDownloadFromDropbox(name, path.resolve(relativeToDropboxDirectory, name), "/");
+            recursivelyDownloadFromDropbox(name, path.resolve(currFolder, name), "/");
         }
         else {
           console.log(">>> Skipping file we already have: " + filename);
