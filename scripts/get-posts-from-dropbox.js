@@ -39,20 +39,24 @@ console.log(`Writing to the folder ${currFolder}`);
   dbx
     .filesListFolder({ path: folderToRetrieve})
     .then((response) => {
-      // console.log(response);
-      // console.log("========");
+    //   console.log(response);
+       console.log("========");
       response.result.entries.forEach(entry => {
         // console.log("========");
         const { name, path_lower } = entry;
 
         const filename = path.resolve(currFolder, name);
 
-        if (entry[".tag"] === "file" && !fs.existsSync(filename)) {
+      //  console.log(entry);
+
+        if (entry[".tag"] === "file"){// && !fs.existsSync(filename)) {
           dbx
             .filesDownload({ path: path_lower })
             .then(data => {
-              const filecontents = data.result.fileBinary.toString();
+              const filecontents = data.result.fileBinary;
 
+              console.log(data);
+              console.log("filename>>>>" + filename);
               fs.outputFile(filename, filecontents).catch(error => {
                 if (error) {
                   return console.log("Error: file failed to write", name, error);

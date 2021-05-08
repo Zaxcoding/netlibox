@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-topdir="$(pwd)/images"
+topdir=$(pwd)/images
 scriptdir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 # configuration
