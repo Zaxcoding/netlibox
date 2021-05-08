@@ -22,47 +22,62 @@ const dbx = new Dropbox({
 const IMAGES_DIRECTORY = path.resolve(__dirname, "../images/");
 fs.ensureDirSync(IMAGES_DIRECTORY);
 
-console.log("Retrieving files from the folder");
 
 // Get all the posts in the root of our our Dropbox App's directory and save
 // them all to our local posts folder.
-dbx
-  .filesListFolder({ path: "" })
-  .then((response) => {
-    // console.log(response);
-    // console.log("========");
-    response.result.entries.forEach(entry => {
+
+function recursivelyDownloadFromDropbox(
+  toRetrieve = "", 
+  currFolder = IMAGES_DIRECTORY, 
+  relativeToDropboxDirectory = ""
+) {
+
+const folderToRetrieve = path.join(relativeToDropboxDirectory, toRetrieve) == "." ? "" : path.join(relativeToDropboxDirectory, toRetrieve);
+
+console.log(`Retrieving files from the folder "${folderToRetrieve}"`);
+  dbx
+    .filesListFolder({ path: folderToRetrieve})
+    .then((response) => {
+      // console.log(response);
       // console.log("========");
-      // console.log(entry);
-      const { name, path_lower } = entry;
+      response.result.entries.forEach(entry => {
+        // console.log("========");
+        console.log(entry);
+        const { name, path_lower } = entry;
 
-      const filename = path.resolve(IMAGES_DIRECTORY, name);
+        const filename = path.resolve(currFolder, name);
 
-      if (entry[".tag"] === "file" && !fs.existsSync(filename)) {
-        dbx
-          .filesDownload({ path: path_lower })
-          .then(data => {
-            console.log("========");
-            console.log("========");
-            console.log("========");
-            console.log(data);
-            const filecontents = data.result.fileBinary.toString();
+        if (entry[".tag"] === "file" && !fs.existsSync(filename)) {
+          dbx
+            .filesDownload({ path: path_lower })
+            .then(data => {
+              console.log("========");
+              console.log("========");
+              console.log("========");
+              console.log(data);
+              const filecontents = data.result.fileBinary.toString();
 
-            fs.outputFile(filename, filecontents).catch(error => {
-              if (error) {
-                return console.log("Error: file failed to write", name, error);
-              }
+              fs.outputFile(filename, filecontents).catch(error => {
+                if (error) {
+                  return console.log("Error: file failed to write", name, error);
+                }
+              });
+            })
+            .catch(error => {
+              console.log("Error: file failed to download", name, error);
             });
-          })
-          .catch(error => {
-            console.log("Error: file failed to download", name, error);
-          });
-      }
-      else {
-        console.log(">>> Skipping file we already have: " + filename);
-      }
+        }
+        else if (entry[".tag"] === "folder") {
+            recursivelyDownloadFromDropbox(name, path.resolve(relativeToDropboxDirectory, name), "/");
+        }
+        else {
+          console.log(">>> Skipping file we already have: " + filename);
+        }
+      });
+    })
+    .catch(error => {
+      console.log("Error retrieving folder: " + error);
     });
-  })
-  .catch(error => {
-    console.log("Error retrieving folder: " + error);
-  });
+}
+
+recursivelyDownloadFromDropbox();
