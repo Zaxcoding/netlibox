@@ -19,30 +19,32 @@ const dbx = new Dropbox({
 
 // Clean anything up that exists already, since we'll be re-building this folder
 // everytime we run a build
-const POSTS_DIR = path.resolve(__dirname, "../src/_posts");
-fs.removeSync(POSTS_DIR);
-fs.ensureDirSync(POSTS_DIR);
+const IMAGES_DIRECTORY = path.resolve(__dirname, "../images/");
+fs.ensureDirSync(IMAGES_DIRECTORY);
+
+console.log("Retrieving files from the folder");
 
 // Get all the posts in the root of our our Dropbox App's directory and save
 // them all to our local posts folder.
 dbx
   .filesListFolder({ path: "" })
   .then((response) => {
-    console.log(response);
-    console.log("========");
+    // console.log(response);
+    // console.log("========");
     response.result.entries.forEach(entry => {
-    console.log("========");
-      console.log(entry);
+      // console.log("========");
+      // console.log(entry);
       const { name, path_lower } = entry;
 
-      if (entry[".tag"] === "file") {
+      const filename = path.resolve(IMAGES_DIRECTORY, name);
+
+      if (entry[".tag"] === "file" && !fs.existsSync(filename)) {
         dbx
           .filesDownload({ path: path_lower })
           .then(data => {
-            const filename = path.resolve(POSTS_DIR, name);
-    console.log("========");
-    console.log("========");
-    console.log("========");
+            console.log("========");
+            console.log("========");
+            console.log("========");
             console.log(data);
             const filecontents = data.result.fileBinary.toString();
 
@@ -56,8 +58,11 @@ dbx
             console.log("Error: file failed to download", name, error);
           });
       }
+      else {
+        console.log(">>> Skipping file we already have: " + filename);
+      }
     });
   })
   .catch(error => {
-    console.log(error);
+    console.log("Error retrieving folder: " + error);
   });

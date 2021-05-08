@@ -7,7 +7,7 @@
     "get-posts": "node ./scripts/get-posts-from-dropbox.js",
     "start": "npm run get-posts && cd ./src && bundle exec jekyll serve",
     "start-netlify-functions": "netlify-lambda serve ./src/_netlify-functions",
-    "build": "npm run get-posts && npm run build-netlify-functions && cd ./src && bundle exec jekyll build",
+    "build": "npm run get-posts && npm run build-netlify-functions && ./expose.sh",
     "build-netlify-functions": "netlify-lambda build ./src/_netlify-functions",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
